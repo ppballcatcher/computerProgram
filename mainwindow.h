@@ -5,8 +5,9 @@
 
 #include <QtSerialPort/QSerialPort>
 #include <vector>
-#include <QWidget>
-
+#include <QGraphicsScene>
+#include <QGraphicsView>
+#include <QGraphicsEllipseItem>
 
 //Namespaces
 using namespace std;
@@ -31,9 +32,9 @@ public:
     ~Hit(){}
 
     //Methods
-    unsigned char getX(){return x_;}
-    unsigned char getY(){return y_;}
-    unsigned char getHash(){return hash_;}
+    double getX() const {return x_;}
+    double getY() const {return y_;}
+    int getHash() const {return hash_;}
 
 private:
     double x_;
@@ -52,7 +53,7 @@ public:
 
     //Methods
     void printBase();
-    void printHit(Hit& hit);
+    void printHit(const Hit &hit);
     void printHistory();
 
 private slots:
@@ -75,6 +76,11 @@ private:
     RenderArea *renderArea;
 
     vector<Hit> history;
+    qreal multiplier;
+    qreal platformSide;
+    QGraphicsScene *scene;
+    QGraphicsView *view;
+    QGraphicsEllipseItem *hitItem;
 };
 
 #endif // MAINWINDOW_H

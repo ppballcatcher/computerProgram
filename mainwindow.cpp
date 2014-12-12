@@ -19,7 +19,8 @@
  */
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::MainWindow)
+    ui(new Ui::MainWindow),
+    hitItem(0)
 {
     ui->setupUi(this);
 
@@ -43,6 +44,14 @@ MainWindow::MainWindow(QWidget *parent) :
     } else {
         ui->statusBar->showMessage(":(");
     }
+
+    multiplier = 0.0555;
+    platformSide = 450;
+
+    scene = new QGraphicsScene;
+    scene->setSceneRect(0, 0, platformSide, platformSide);
+    view = new QGraphicsView(scene);
+    ui->drawingLayout->addWidget(view);
 
     //Print base
     printBase();
@@ -127,6 +136,7 @@ void MainWindow::readData()
 
         ///Generate the Hit and save it in the vector
         history.push_back(Hit(hash, x, y));
+        printHit(*(history.end()-1));
     }
 }
 
@@ -152,16 +162,33 @@ void MainWindow::on_actionConfigure_clicked()
 }
 
 
-void MainWindow::printBase(){
-
-
+void MainWindow::printBase()
+{
+    scene->addEllipse(platformSide * multiplier, platformSide * multiplier, platformSide * multiplier, platformSide * multiplier);
+    scene->addEllipse(platformSide * (1 - 2 * multiplier), platformSide * multiplier, platformSide * multiplier, platformSide * multiplier);
+    scene->addEllipse(platformSide * (1 - 2 * multiplier), platformSide * (1 - 2 * multiplier), platformSide * multiplier, platformSide * multiplier);
+    scene->addEllipse(platformSide * multiplier, platformSide * (1 - 2 * multiplier), platformSide * multiplier, platformSide * multiplier);
 }
 
+void MainWindow::printHit(Hit const& hit)
+{
+    if (!hitItem) {
+        hitItem = new QGraphicsEllipseItem(0, 0, multiplier * platformSide, multiplier * platformSide);
+        scene->addItem(hitItem);
+    }
 
-void MainWindow::printHit(Hit& hit){
-
+    double x = hit.getX();
+    double y = hit.getY();
+    hitItem->setPos(x, y);
 }
 
-void MainWindow::printHistory(){
+void MainWindow::printHistory()
+{
+    scene->clear();
+    printBase();
 
+    for (auto const &hit : history) {
+        QGraphicsEllipseItem *item = new QGraphicsEllipseItem(hit.getX(), hit.getY(), multiplier * platformSide, multiplier * platformSide);
+        scene->addItem(hitItem);
+    }
 }

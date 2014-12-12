@@ -10,6 +10,7 @@ greaterThan(QT_MAJOR_VERSION, 4) : QT += widgets serialport
 
 TARGET = reProject2
 TEMPLATE = app
+CONFIG += c++11
 
 
 SOURCES += \
