@@ -42,11 +42,7 @@ MainWindow::MainWindow(QWidget *parent) :
             SLOT(handleError(QSerialPort::SerialPortError))); //If we
             //receive an error show an error show an error message
 
-    if (serial->open(QIODevice::ReadWrite)){
-        ui->statusBar->showMessage("Connected!");
-    } else {
-        ui->statusBar->showMessage(":(");
-    }
+    openSerialPort();
 
     multiplier = 0.0555;
     platformSide = 450;
@@ -91,7 +87,9 @@ void MainWindow::openSerialPort()
     serial->setParity(p.parity);
     serial->setStopBits(p.stopBits);
     serial->setFlowControl(p.flowControl);
+
     if (serial->open(QIODevice::ReadWrite)) {
+qDebug() << "asasd";
             ui->statusBar->showMessage(tr("Connected to %1 : %2, %3, %4, %5, %6")
                                        .arg(p.name).arg(p.stringBaudRate).arg(p.stringDataBits)
                                        .arg(p.stringParity).arg(p.stringStopBits).arg(p.stringFlowControl));
