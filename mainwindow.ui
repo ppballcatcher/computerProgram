@@ -58,15 +58,16 @@
      </item>
     </layout>
    </widget>
-   <widget class="QWidget" name="widget" native="true">
+   <widget class="QWidget" name="verticalLayoutWidget">
     <property name="geometry">
      <rect>
-      <x>175</x>
-      <y>20</y>
-      <width>450</width>
-      <height>450</height>
+      <x>169</x>
+      <y>9</y>
+      <width>481</width>
+      <height>471</height>
      </rect>
     </property>
+    <layout class="QVBoxLayout" name="drawingLayout"/>
    </widget>
   </widget>
   <widget class="QStatusBar" name="statusBar">

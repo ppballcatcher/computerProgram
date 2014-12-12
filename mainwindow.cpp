@@ -153,9 +153,10 @@ void MainWindow::on_actionConfigure_clicked()
 
 
 void MainWindow::printBase(){
-    QRect base(174,20,450,450);
+
 
 }
+
 
 void MainWindow::printHit(Hit& hit){
 

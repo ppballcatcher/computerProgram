@@ -5,7 +5,8 @@
 
 #include <QtSerialPort/QSerialPort>
 #include <vector>
-#include <QGraphicsScene>
+#include <QWidget>
+
 
 //Namespaces
 using namespace std;
@@ -15,6 +16,7 @@ class MainWindow;
 }
 
 class SettingsDialog;
+class RenderArea;
 
 class Hit
 {
@@ -70,7 +72,7 @@ private:
     QSerialPort *serial;
     SettingsDialog *settings;
 
-    QGraphicsScene *scene;
+    RenderArea *renderArea;
 
     vector<Hit> history;
 };
