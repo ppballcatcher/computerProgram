@@ -6,6 +6,7 @@
 #include "settingsdialog.h"
 #include "hit.h"
 
+
 class SerialThread : public QThread
 {
     Q_OBJECT
@@ -23,6 +24,7 @@ public slots:
 signals:
     void hit(Hit hit);
     void error(QSerialPort::SerialPortError err);
+    void changeStatusBar(QString);
 
 private slots:
     void handleError(QSerialPort::SerialPortError error);

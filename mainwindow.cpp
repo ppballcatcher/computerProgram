@@ -1,7 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "settingsdialog.h"
-//#include "console.h"
 #include "serialthread.h"
 #include <QMessageBox>
 #include <QtSerialPort/QtSerialPort>
@@ -20,8 +19,6 @@
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
-//    serial(new QSerialPort),
-    m_reader(this),
     hitItem(nullptr)
 {
     ui->setupUi(this);
@@ -36,7 +33,10 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->actionConfigure, SIGNAL(clicked()),
             settings, SLOT(show())); //Configure
 
-    connect(&m_reader, &SerialThread::error, this, &MainWindow::serialPortError);
+    connect(settings, SIGNAL(updateSettingsSignal()),
+            this, SLOT(openSerialPort()));
+
+    m_reader=nullptr;
     openSerialPort();
 
     multiplier = 0.0555;
@@ -49,8 +49,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
     //Print base
     printBase();
-
-    connect(&m_reader, &SerialThread::hit, this, &MainWindow::newHit);
 }
 
 /**
@@ -58,8 +56,8 @@ MainWindow::MainWindow(QWidget *parent) :
  */
 MainWindow::~MainWindow()
 {
-    m_reader.quit();
-    m_reader.wait();
+    m_reader->quit();
+    m_reader->wait();
     closeSerialPort();
 //    delete serial;
     delete settings;
@@ -77,8 +75,17 @@ MainWindow::~MainWindow()
  */
 void MainWindow::openSerialPort()
 {
-    m_reader.setSettings(settings->settings());
-    m_reader.start();
+    if (m_reader){
+        m_reader->quit();
+        m_reader->wait();
+        delete m_reader;
+    }
+    m_reader = new SerialThread(this);
+    connect(m_reader, &SerialThread::error, this, &MainWindow::serialPortError);
+    connect(m_reader, &SerialThread::changeStatusBar, this, &MainWindow::changeStatusBar);
+    connect(m_reader, &SerialThread::hit, this, &MainWindow::newHit);
+    m_reader->setSettings(settings->settings());
+    m_reader->start();
 }
 
 /**
@@ -161,4 +168,13 @@ void MainWindow::on_actionHistory_clicked(bool checked)
         printBase();
         ui->actionHistory->setChecked(false);
     }
+}
+
+/**
+ * @brief MainWindow::changeStatusBar
+ * @param data
+ */
+void MainWindow::changeStatusBar(QString data)
+{
+    ui->statusBar->showMessage(data);
 }

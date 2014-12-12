@@ -36,15 +36,17 @@ public:
     void printHit(const Hit &hit);
     void printHistory();
 
+
 public slots:
     void newHit(Hit hit);
     void serialPortError(QSerialPort::SerialPortError err);
+    void changeStatusBar(QString data);
+    void openSerialPort();
 
 private slots:
     //Serial connection
-    void openSerialPort();
-    void closeSerialPort();
 
+    void closeSerialPort();
     void on_actionConfigure_clicked();
     void on_actionHistory_clicked(bool checked);
 
@@ -54,7 +56,7 @@ private:
     SettingsDialog *settings;
 
     RenderArea *renderArea;
-    SerialThread m_reader;
+    SerialThread *m_reader;
     vector<Hit> history;
     qreal multiplier;
     qreal platformSide;

@@ -134,6 +134,7 @@ void SettingsDialog::showPortInfo(int idx)
 void SettingsDialog::apply()
 {
     updateSettings();
+    emit updateSettings();
     hide();
 }
 
@@ -163,7 +164,7 @@ void SettingsDialog::fillPortsParameters()
     ui->baudRateBox->addItem(QStringLiteral("38400"), QSerialPort::Baud38400);
     ui->baudRateBox->addItem(QStringLiteral("115200"), QSerialPort::Baud115200);
     ui->baudRateBox->addItem(QStringLiteral("Custom"));
-    ui->baudRateBox->setCurrentIndex(3);
+    ui->baudRateBox->setCurrentIndex(0);
 
     ui->dataBitsBox->addItem(QStringLiteral("5"), QSerialPort::Data5);
     ui->dataBitsBox->addItem(QStringLiteral("6"), QSerialPort::Data6);
@@ -250,4 +251,12 @@ void SettingsDialog::updateSettings()
     currentSettings.stringFlowControl = ui->flowControlBox->currentText();
 
     currentSettings.localEchoEnabled = ui->localEchoCheckBox->isChecked();
+}
+
+/**
+ * @brief SettingsDialog::on_applyButton_clicked
+ */
+void SettingsDialog::on_applyButton_clicked()
+{
+    apply();
 }

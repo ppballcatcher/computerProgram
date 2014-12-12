@@ -3,6 +3,7 @@
 #include <iostream>
 #include "serialthread.h"
 
+
 SerialThread::SerialThread(QObject *parent)
     : QThread(parent)
     , m_quit(false)
@@ -37,6 +38,7 @@ void SerialThread::run()
 
             if (len > 0) {
                 QString data(buf);
+                qDebug() << data;
                 data.remove('\n');
                 QStringList dataList = data.split(",", QString::SkipEmptyParts);
 
@@ -53,7 +55,7 @@ void SerialThread::run()
                     QString yString = dataList.at(2);
                     double y = yString.toDouble(&ok[2]);
 
-                    if (ok[0] && ok[1] && ok[2] && ok[3] && id != id_prev) {
+                    if (ok[0] && ok[1] && ok[2] && id != id_prev) {
                         id_prev = id;
                         emit hit(Hit(id, x, y));
                     }
@@ -89,6 +91,11 @@ void SerialThread::handleError(QSerialPort::SerialPortError err)
     quit();
 }
 
+/**
+ * @brief SerialThread::setupSerialPort
+ * @param port
+ * @return
+ */
 bool SerialThread::setupSerialPort(QSerialPort *port)
 {
     port->setPortName(m_settings.name);
@@ -99,14 +106,19 @@ bool SerialThread::setupSerialPort(QSerialPort *port)
     port->setFlowControl(m_settings.flowControl);
 
     if (port->open(QIODevice::ReadWrite)) {
-        qDebug() << QString(tr("Connected to %1 : %2, %3, %4, %5, %6")
-                            .arg(m_settings.name).arg(m_settings.stringBaudRate).arg(
-                                m_settings.stringDataBits)
-                            .arg(m_settings.stringParity).arg(m_settings.stringStopBits).arg(
-                                m_settings.stringFlowControl));
+        emit(changeStatusBar(QString(tr("Connected to %1 : %2, %3, %4, %5, %6")
+                            .arg(m_settings.name)
+                            .arg(m_settings.stringBaudRate)
+                            .arg(m_settings.stringDataBits)
+                            .arg(m_settings.stringParity)
+                            .arg(m_settings.stringStopBits)
+                            .arg(m_settings.stringFlowControl)
+                            )
+                        )
+                );
         return true;
     } else {
-        qDebug() << "Not open :(";
+        emit(changeStatusBar(QString(tr(":("))));
         return false;
     }
 }
