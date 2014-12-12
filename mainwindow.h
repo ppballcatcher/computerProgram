@@ -3,11 +3,14 @@
 
 #include <QMainWindow>
 
-#include <QtSerialPort/QSerialPort>
+#include <QSerialPort>
 #include <vector>
 #include <QGraphicsScene>
 #include <QGraphicsView>
 #include <QGraphicsEllipseItem>
+
+#include "serialthread.h"
+#include "hit.h"
 
 //Namespaces
 using namespace std;
@@ -19,36 +22,13 @@ class MainWindow;
 class SettingsDialog;
 class RenderArea;
 
-class Hit
-{
-public:
-    //Constructors
-    Hit(int hash, double x, double y){
-        hash_ = hash;
-        x_ = x;
-        y_ = y;
-    }
-
-    ~Hit(){}
-
-    //Methods
-    double getX() const {return x_;}
-    double getY() const {return y_;}
-    int getHash() const {return hash_;}
-
-private:
-    double x_;
-    double y_;
-    int hash_;
-};
-
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
 public:
     //Constructors
-    explicit MainWindow(QWidget *parent = 0);
+    explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
     //Methods
@@ -56,24 +36,25 @@ public:
     void printHit(const Hit &hit);
     void printHistory();
 
+public slots:
+    void newHit(Hit hit);
+    void serialPortError(QSerialPort::SerialPortError err);
+
 private slots:
     //Serial connection
     void openSerialPort();
     void closeSerialPort();
-    void readData();
-
-    void handleError(QSerialPort::SerialPortError error);
 
     void on_actionConfigure_clicked();
     void on_actionHistory_clicked(bool checked);
 
 private:
     Ui::MainWindow *ui;
-    QSerialPort *serial;
+//    QSerialPort *serial;
     SettingsDialog *settings;
 
     RenderArea *renderArea;
-
+    SerialThread m_reader;
     vector<Hit> history;
     qreal multiplier;
     qreal platformSide;

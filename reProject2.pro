@@ -16,11 +16,14 @@ CONFIG += c++11
 SOURCES += \
     main.cpp\
     mainwindow.cpp \
-    settingsdialog.cpp
+    settingsdialog.cpp \
+    serialthread.cpp
 
 HEADERS  += \
     mainwindow.h \
-    settingsdialog.h
+    settingsdialog.h \
+    hit.h \
+    serialthread.h
 
 
 FORMS    += \
