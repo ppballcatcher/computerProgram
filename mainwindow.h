@@ -65,8 +65,7 @@ private slots:
     void handleError(QSerialPort::SerialPortError error);
 
     void on_actionConfigure_clicked();
-
-
+    void on_actionHistory_clicked(bool checked);
 
 private:
     Ui::MainWindow *ui;

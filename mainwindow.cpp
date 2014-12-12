@@ -31,13 +31,16 @@ MainWindow::MainWindow(QWidget *parent) :
     settings = new SettingsDialog;
 
     ///Connects the buttons to the slots
-    connect(ui->actionConnect, SIGNAL(clicked()), this, SLOT(openSerialPort()));//Connect
-    connect(ui->actionConfigure, SIGNAL(clicked()), settings, SLOT(show())); //Configure
+    connect(ui->actionHistory, SIGNAL(clicked(bool)),
+            this, SLOT(on_actionHistory_clicked(bool))); //Print history
+
+    connect(ui->actionConfigure, SIGNAL(clicked()),
+            settings, SLOT(show())); //Configure
 
     ///Connects
     connect(serial, SIGNAL(error(QSerialPort::SerialPortError)), this,
             SLOT(handleError(QSerialPort::SerialPortError))); //If we
-            //recieve an error show an error show an error message
+            //receive an error show an error show an error message
 
     if (serial->open(QIODevice::ReadWrite)){
         ui->statusBar->showMessage("Connected!");
@@ -55,6 +58,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     //Print base
     printBase();
+    printHit(Hit(1,300,300));
+    printHit(Hit(1,300,200));
 }
 
 /**
@@ -64,7 +69,6 @@ MainWindow::~MainWindow()
 {
     closeSerialPort();
     delete serial;
-    //delete console;
     delete settings;
     delete ui;
 }
@@ -161,15 +165,22 @@ void MainWindow::on_actionConfigure_clicked()
     settings->show();
 }
 
-
+/**
+ * @brief MainWindow::printBase Print the base and the sensors
+ */
 void MainWindow::printBase()
 {
+    //QPen pen()
     scene->addEllipse(platformSide * multiplier, platformSide * multiplier, platformSide * multiplier, platformSide * multiplier);
     scene->addEllipse(platformSide * (1 - 2 * multiplier), platformSide * multiplier, platformSide * multiplier, platformSide * multiplier);
     scene->addEllipse(platformSide * (1 - 2 * multiplier), platformSide * (1 - 2 * multiplier), platformSide * multiplier, platformSide * multiplier);
     scene->addEllipse(platformSide * multiplier, platformSide * (1 - 2 * multiplier), platformSide * multiplier, platformSide * multiplier);
 }
 
+/**
+ * @brief MainWindow::printHit Print a hit
+ * @param hit The hit to be printed
+ */
 void MainWindow::printHit(Hit const& hit)
 {
     if (!hitItem) {
@@ -180,15 +191,29 @@ void MainWindow::printHit(Hit const& hit)
     double x = hit.getX();
     double y = hit.getY();
     hitItem->setPos(x, y);
+    history.push_back(hit);
 }
 
-void MainWindow::printHistory()
+/**
+ * @brief MainWindow::on_actionHistory_clicked Shows all the hits when clicked and clear the
+ * screen when clicked again
+ */
+void MainWindow::on_actionHistory_clicked(bool checked)
 {
-    scene->clear();
-    printBase();
+    if (checked){
+        scene->clear();
+        printBase();
 
-    for (auto const &hit : history) {
-        QGraphicsEllipseItem *item = new QGraphicsEllipseItem(hit.getX(), hit.getY(), multiplier * platformSide, multiplier * platformSide);
-        scene->addItem(hitItem);
+        for (auto const &hit : history) {
+            QGraphicsEllipseItem *item = new QGraphicsEllipseItem(hit.getX(), hit.getY(), multiplier * platformSide, multiplier * platformSide);
+            item->setBrush(Qt::black);
+            scene->addItem(item);
+        }
+
+        ui->actionHistory->setChecked(true);
+    } else {
+        scene->clear();
+        printBase();
+        ui->actionHistory->setChecked(false);
     }
 }
